@@ -4,11 +4,11 @@ This project is a Python implementation of the classic Minesweeper game.
 
 ## Features
 
-**Customizable Grid Size and Mine Count**
--The game allows the player to choose the size of the grid and the number of mines.
+**Customizable Grid Size and Mine Count:**
+  -The game allows the player to choose the size of the grid and the number of mines.
 
 **Game States:**
--The game tracks whether the player wins by successfully clearing the grid or loses by revealing a mine.
+  -The game tracks whether the player wins by successfully clearing the grid or loses by revealing a mine.
 
 ## How it Works
 
@@ -22,7 +22,7 @@ This project is a Python implementation of the classic Minesweeper game.
    - The player loses if they reveal a cell containing a mine.
 
 3. **Replay**
-   - Once the game ends, either by winning or losing, the player can start a new game by 'r'
+   - Once the game ends, either by winning or losing, the player can start a new game with `r` key
 
 ### Credits
 
