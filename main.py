@@ -9,6 +9,7 @@ class Cell:
         self.y = y
         self.is_open = False
         self.is_mine = False
+        self.is_flagged = False
         
 class Board:
     def __init__(self, width, height, num_mines):
@@ -36,7 +37,7 @@ class Board:
             for cell in row:
                 rect = pygame.Rect(cell.x * cell_size, cell.y * cell_size, cell_size, cell_size)
                 if cell.is_open:
-                    color = (200, 200, 200) #açık hücre rengi
+                    color = (200, 200, 200) #open cell color
                     pygame.draw.rect(screen, color, rect)
                     pygame.draw.rect(screen, (0, 0, 0), rect, 1)
                     
@@ -45,12 +46,23 @@ class Board:
                         self.game_over = True
                     else:
                         number = str(self.calculate_neighbors(cell.y, cell.x))
-                        font = pygame.font.Font(None, 36)
-                        text = font.render(number, True, (0, 0, 255))
-                        text_rect = text.get_rect(center=(cell.x * cell_size + 20, cell.y * cell_size + 20))
-                        screen.blit(text, text_rect)
+                        if number != "0":     
+                            font = pygame.font.Font(None, 36)
+                            text = font.render(number, True, (0, 0, 255))
+                            text_rect = text.get_rect(center=(cell.x * cell_size + 20, cell.y * cell_size + 20))
+                            screen.blit(text, text_rect)
+                elif cell.is_flagged:
+                    color = (100, 100, 100) #close cell color
+                    pygame.draw.rect(screen, color, rect)
+                    pygame.draw.rect(screen, (0, 0, 0), rect, 1)
+                    
+                    font = pygame.font.Font(None, 48)
+                    text = font.render("!", True, (255, 0, 0))
+                    text_rect = text.get_rect(center=(cell.x * cell_size + 20, cell.y * cell_size + 20))
+                    screen.blit(text, text_rect)
+                
                 else:
-                    color = (100, 100, 100) #kapalı hücre rengi
+                    color = (100, 100, 100) #close cell color
                     pygame.draw.rect(screen, color, rect)
                     pygame.draw.rect(screen, (0, 0, 0), rect, 1)
     
@@ -71,13 +83,15 @@ class Board:
             
         return mines
 
-    def handle_click(self, pos):
+    def handle_click(self, pos, type):
         cell_size = 40
         x, y = pos
         x //= cell_size
         y //= cell_size
-        if 0 <= x < self.width and 0 <= y < self.height:
+        if 0 <= x < self.width and 0 <= y < self.height and type == 1:
             self.cells[y][x].is_open = True
+        elif 0 <= x < self.width and 0 <= y < self.height and type == 2:
+            self.cells[y][x].is_flagged = not self.cells[y][x].is_flagged 
 
 
     def check_win(self):
@@ -91,7 +105,7 @@ class Board:
     def draw_message(self, screen, message):
         font = pygame.font.Font(None, 74)
         text = font.render(message, True, (255, 0, 0))
-        text_rect = text.get_rect(center=(screen.get_width() // 2, screen.get_height() //2))
+        text_rect = text.get_rect(center=(screen.get_width() // 2, screen.get_height() - 50))
         screen.blit(text, text_rect)
         
         
@@ -111,7 +125,7 @@ pygame.display.set_icon(icon)
 
 width = 10
 height = 10
-mines = 15
+mines = 20
 board = Board(width, height, mines)
 
 running = True
@@ -123,12 +137,15 @@ while running:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        elif event.type == pygame.MOUSEBUTTONDOWN and not board.game_over:
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not board.game_over:
             pos = pygame.mouse.get_pos()
-            board.handle_click(pos)
+            board.handle_click(pos, 1)
             if board.check_win():
                 board.game_over = True
                 game_won = True
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3 and not board.game_over:
+            pos = pygame.mouse.get_pos()
+            board.handle_click(pos, 2)
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
                 board = Board(width, height, mines)
